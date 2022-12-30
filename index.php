@@ -1,3 +1,11 @@
+<?php
+session_start();
+if (!isset($_SESSION['username'])){
+    $_SESSION['msg'] = 'anda harus login';
+    header('Location: login.php');
+}
+?>
+
 <?php 
 
 require 'function.php';
@@ -8,8 +16,7 @@ if( isset($_POST["cari"])) {
 
 	$penitipan = cari($_POST["keyword"]);
 }
-
-					
+				
 ?>
 
 <!DOCTYPE html>
@@ -29,18 +36,20 @@ if( isset($_POST["cari"])) {
    <article class="card" style="text-align: center;">
 
 
-<h1>Daftar Hewan Penitipan Hewan</h1>
+<h1>Daftar Hewan yang di titipkan</h1>
 
 
 
 <a href="tambah.php">Tambah data Hewan</a>
 <br></br>
-<form action="" method="post">
-	<input type="text" name="keyword" size="30" autofocus
+<form action="" method="get">
+	<input type="text" name="search" size="30" autofocus
 	placeholder="Masukan keyword pencarian.." autocomplete="off">
 	<!-- Autofocus buat user bisa langsung type saat buka halaman, autocomplete off buat matiin history pencarian -->
-	<button type="submit" name="cari">Cari</button>
-
+	<input type="submit" value="Search">
+	<a href="logout.php">LOGOUT</a>
+	<a href="bar.php">BAR</a>
+	<a href="pie.php">PIE</a>
 </form>
 <br></br>
 <div class="table-responsive">
@@ -54,34 +63,54 @@ if( isset($_POST["cari"])) {
 		<th>Aksi</th>
 	</tr>
 
-	 <?php $batas = 4;
-		$halaman = isset($_GET['halaman'])?(int)$_GET['halaman'] : 1;
-		$halaman_awal = ($halaman>1) ? ($halaman * $batas) - $batas : 0;	
- 		$previous = $halaman - 1;
-		$next = $halaman + 1;
-		$penitipan= mysqli_query($conn, "select * from penitipan");
-		$jumlah_data = mysqli_num_rows($penitipan);
-		$total_halaman = ceil($jumlah_data / $batas);
-		$penitipan = mysqli_query($conn,"select * from penitipan limit $halaman_awal, $batas");
-		$nomor = $halaman_awal+1;
-		while($row= mysqli_fetch_array($penitipan)){
-					?>
-					<tr>
-		<td><?php echo $nomor++; ?></td>
-		<td><?php echo  $row['nama']; ?></td>
-		<td><?php echo $row['hewan']; ?></td>
-		<td><?php echo $row['alamat']; ?></td>
-		<td><?php echo  $row['email']; ?></td>
-		<td>
-			<a href="ubah.php?id=<?= $row["id"]; ?>">Edit data</a> | 
-			<a href="hapus.php?id=<?= $row["id"]; ?>" onclick="return confirm('Apakah anda yakin menghapus data ini?');">Hapus data </a>
-		</td>
-
-	</tr>
-	
 	<?php
+				$batas = 3; 
+				$halaman = $_GET['halaman'] ?? null;
+
+				if(empty($halaman)){
+					$posisi = 0; $halaman = 1;
+				}else{
+					$posisi = ($halaman-1) * $batas;
 				}
-				?>
+
+				if(isset($_GET['search'])){ 
+					$search = $_GET['search']; 
+					$sql="SELECT * FROM penitipan WHERE hewan LIKE '%$search%' ORDER BY id ASC LIMIT $posisi, $batas"; 
+				}else{ 
+					$sql="SELECT * FROM penitipan ORDER BY id ASC LIMIT $posisi, $batas";
+				}
+
+				$hasil=mysqli_query($conn, $sql); 
+				while ($data = mysqli_fetch_array($hasil)) {
+			?>
+				
+			
+					<tr>
+		<td><?php echo $data['id']; ?></td>
+		<td><?php echo  $data['nama']; ?></td>
+		<td><?php echo $data['hewan']; ?></td>
+		<td><?php echo $data['alamat']; ?></td>
+		<td><?php echo  $data['email']; ?></td>
+		<td>
+			<a href="ubah.php?id=<?= $data["id"]; ?>">Edit data</a> | 
+			<a href="hapus.php?id=<?= $data["id"]; ?>" onclick="return confirm('Apakah anda yakin menghapus data ini?');">Hapus data </a>
+		</td>
+		<?php } ?>
+		</tr>
+		<?php
+
+			if(isset($_GET['search'])){
+				$search= $_GET['search']; 
+				$query2="SELECT * FROM penitipan WHERE hewan LIKE '%$search%' ORDER BY id ASC"; 
+			}else{ 
+				$query2="SELECT * FROM penitipan ORDER BY id ASC";
+			}
+
+			$result2 = mysqli_query($conn, $query2); 
+			$jmldata = mysqli_num_rows($result2); 
+			$jmlhalaman = ceil($jmldata/$batas);
+		?>
+	
 
 </table>
 <br>
@@ -89,20 +118,23 @@ if( isset($_POST["cari"])) {
 <div>
 	<nav>
 <ul class="pagination justify-content-center">
-				<li class="page-item">
-					<a class="page-link" <?php if($halaman > 1){ echo "href='?halaman=$previous'"; } ?>>Previous</a>
-				</li>
-				<?php 
-				for($x=1;$x<=$total_halaman;$x++){
-					?> 
-					<li class="page-item"><a class="page-link" href="?halaman=<?php echo $x ?>"><?php echo $x; ?></a></li>
-					<?php
+<?php 
+				for($i=1;$i<=$jmlhalaman; $i++) {
+					if ($i != $halaman) { 
+						if(isset($_GET['search'])){ 
+							$search = $_GET['search'];
+							echo "<li class='page-item'><a class='page-link' href='index.php?halaman=$i&search=$search'>
+								  $i</a></li>";
+						}else{ 
+							echo "<li class='page-item'><a class='page-link' href='index.php?halaman=$i'>$i</a></li>";
+						}
+					} else {
+						echo "<li class='page-item active'><a class='page-link' href='#'>$i</a></li>";
+					}
 				}
-				?>				
-				<li class="page-item">
-					<a  class="page-link" <?php if($halaman < $total_halaman) { echo "href='?halaman=$next'"; } ?>>Next</a>
-				</li>
+			?>
 			</ul>
+		
 			</nav>
   		</div> 
 	</div>

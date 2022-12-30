@@ -49,23 +49,23 @@ if( isset($_POST["submit"])) {
 	<form action="" method="post" enctype="multipart/form-data" style="text-align: center;">
 		<ul >
 			<li style="list-style: none;">
-				<label for="nama">Nama: </label><br>	
-				<input type="text" name="nama" id="nama"required>
+				<label for="hewan">hewan: </label><br>	
+				<input type="text" name="hewan" id="hewan"required>
 			</li>
 			<li style="list-style: none;">
-				<label for="hewan">Hewan: </label><br>
-				<input type="text" name="hewan" id="hewan" required>
+				<label for="nama">nama: </label><br>
+				<input type="text" name="nama" id="nama" required>
 			</li>
 			<li style="list-style: none;">
-				<label for="alamat"> Alamat: </label><br>
-				<input type="text" name="alamat" id="alamat"required>
+				<label for="email"> email: </label><br>
+				<input type="text" name="email" id="email"required>
 			</li>
 		
 			<li style="list-style: none;">
-				<label for="email"> Email: </label><br>
-				<input type="text" name="email" id="email"required>
+				<label for="alamat"> alamat: </label><br>
+				<input type="text" name="alamat" id="alamat"required>
 			</li>
-			
+
 			<li style="list-style: none;"><br>
 				<button type="Submit" name="submit">Submit</button>
 			</li>

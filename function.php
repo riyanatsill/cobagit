@@ -22,11 +22,11 @@
   	$nama = htmlspecialchars($data["nama"]);
   	$email = htmlspecialchars($data["email"]);
   	$alamat= htmlspecialchars($data["alamat"]);
-  	
+
   
   	$query = "INSERT INTO penitipan
   				VALUES
-  				(' ', '$nama', '$hewan','$alamat', '$email')";
+  				(' ', '$hewan', '$nama','$email', '$alamat')";
   			mysqli_query($conn, $query);
   	return mysqli_affected_rows($conn);
   
@@ -46,11 +46,11 @@
   	$id = $data["id"];
   	$hewan = htmlspecialchars($data["hewan"]);
   	$nama = htmlspecialchars($data["nama"]);
-  	$email = htmlspecialchars($data["email"]);
+	$email = htmlspecialchars($data["email"]);
   	$alamat= htmlspecialchars($data["alamat"]);
   	$query = "UPDATE penitipan SET
   				nama = '$nama',
-  				email = '$email',
+  	 			email = '$email',
   				hewan = '$hewan',
   				alamat = '$alamat'
   				WHERE id = $id
